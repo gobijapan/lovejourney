@@ -1,0 +1,9 @@
+{
+  "name": "LoveJourney",
+  "description": "Ứng dụng theo dõi hành trình tình yêu: đếm ngày, lưu giữ kỷ niệm, gợi ý địa điểm hẹn hò và nhắc nhở ngày kỷ niệm.",
+  "requestFramePermissions": [
+    "geolocation",
+    "microphone",
+    "camera"
+  ]
+}

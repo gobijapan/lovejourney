@@ -1,0 +1,21 @@
+{
+  "short_name": "LoveJourney",
+  "name": "LoveJourney - Hành Trình Yêu",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#fa3452",
+  "background_color": "#ffffff",
+  "orientation": "portrait"
+}
