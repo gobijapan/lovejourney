@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Heart, Image, MapPin, Settings, CalendarClock } from 'lucide-react';
 import { AppView } from '../types';
@@ -21,10 +22,10 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onChangeView, children }) 
   return (
     <div className="flex flex-col h-[100dvh] w-full relative overflow-hidden bg-white dark:bg-slate-950">
       {/* Main Content Area */}
-      {/* Added pt-[calc(env(safe-area-inset-top)+1rem)] to ensure content starts below Dynamic Island */}
+      {/* Increased padding top and bottom for safe areas */}
       <div 
-        className="flex-1 overflow-y-auto pb-32 relative z-10 scroll-smooth no-scrollbar"
-        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1rem)' }} 
+        className="flex-1 overflow-y-auto pb-48 relative z-10 scroll-smooth no-scrollbar"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 2rem)' }} 
       >
         {children}
       </div>
