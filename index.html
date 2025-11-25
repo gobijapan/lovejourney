@@ -12,7 +12,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="LoveJourney">
-    <link rel="apple-touch-icon" href="/lovejourney-icon-512.png">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Dancing+Script:wght@700&family=Pacifico&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Quicksand:wght@400;600;700&family=Merriweather:wght@300;700&family=Montserrat:wght@400;700&family=Lobster&display=swap" rel="stylesheet">
@@ -73,6 +73,10 @@
       :root {
         --theme-rgb: 250, 52, 82; /* Default Red */
         --card-opacity: 0.65;
+        
+        /* Define Safe Area Variables with fallback */
+        --safe-top: env(safe-area-inset-top, 20px);
+        --safe-bottom: env(safe-area-inset-bottom, 20px);
       }
       
       /* Reset standard body padding to allow background bleed behind Notch */
@@ -93,26 +97,31 @@
         background: rgba(var(--theme-rgb), 0.5);
         border-radius: 4px;
       }
+      
+      /* Updated Glass Classes for Better Transparency Control */
       .glass {
         background: rgba(255, 255, 255, var(--card-opacity));
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.5);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
       }
       .dark .glass {
         background: rgba(17, 24, 39, var(--card-opacity));
         border: 1px solid rgba(255, 255, 255, 0.1);
       }
+      
       .glass-card {
-        background: rgba(255, 255, 255, var(--card-opacity));
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        background-color: rgba(255, 255, 255, var(--card-opacity));
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
       }
       .dark .glass-card {
-        background: rgba(0, 0, 0, var(--card-opacity));
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        background-color: rgba(0, 0, 0, var(--card-opacity));
+        border: 1px solid rgba(255, 255, 255, 0.1);
       }
+      
       .no-scrollbar::-webkit-scrollbar {
         display: none;
       }
