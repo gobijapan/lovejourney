@@ -319,8 +319,8 @@ const HomeView: React.FC<{ data: CoupleData, plans: PlanItem[], memories: Memory
       {activeReminders.length > 0 && (
           <div className="w-full max-w-sm mb-6 space-y-2">
               {activeReminders.map((r, i) => (
-                    <div key={i} className={`backdrop-blur-md border p-3 rounded-2xl flex items-start gap-3 animate-pulse-slow ${
-                        r.type === 'memory' ? 'bg-purple-500/10 border-purple-500/30' : 'bg-red-500/10 border-red-500/30'
+                    <div key={i} className={`glass-card p-3 rounded-2xl flex items-start gap-3 animate-pulse-slow ${
+                        r.type === 'memory' ? 'border-purple-500/30' : 'border-red-500/30'
                     }`}>
                       <div className={`p-2 rounded-full text-white shadow-lg ${r.type === 'memory' ? 'bg-purple-500 shadow-purple-500/40' : 'bg-red-500 shadow-red-500/40'}`}>
                           {r.type === 'memory' ? <History size={20} /> : <BellRing size={20} />}
@@ -652,7 +652,7 @@ const MemoriesView: React.FC<{
                                 <div className="absolute -left-[9px] top-6 w-4 h-4 rounded-full bg-theme-500 border-4 border-white dark:border-slate-950"></div>
                                 <span className="text-xs font-bold text-slate-400 mb-1 block uppercase">{formatDateVN(mem.date)}</span>
                                 
-                                <div className="glass-card bg-white/40 dark:bg-slate-800/40 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                                <div className="glass-card p-4 rounded-2xl shadow-sm">
                                     <div className="flex justify-between items-start">
                                         <h3 className="font-bold text-slate-800 dark:text-white mb-2 text-lg">{mem.title}</h3>
                                         <div className="flex gap-2">
@@ -917,7 +917,7 @@ const PlansView: React.FC<PlansViewProps> = ({ fontStyle, plans, onSavePlan, onD
                 {filteredPlans.map(plan => {
                     const days = getDaysLeft(plan.targetDate);
                     return (
-                        <div key={plan.id} className={`glass-card p-4 rounded-2xl border transition-all ${plan.completed ? 'bg-green-50/50 dark:bg-green-900/10 border-green-200' : 'bg-white/40 dark:bg-slate-800/40 border-slate-100 dark:border-slate-700 shadow-sm'}`}>
+                        <div key={plan.id} className={`glass-card p-4 rounded-2xl border transition-all ${plan.completed ? 'bg-green-50/50 dark:bg-green-900/10 border-green-200' : 'border-slate-100 dark:border-slate-700 shadow-sm'}`}>
                             <div className="flex items-start justify-between mb-2">
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-1">
@@ -1015,7 +1015,7 @@ const PlacesView: React.FC<{ fontStyle: string }> = ({ fontStyle }) => {
                <button 
                 key={c.id} 
                 onClick={() => setSelectedCategory(c.id)}
-                className="glass-card p-4 rounded-2xl flex flex-col items-center gap-2 bg-white/40 dark:bg-slate-800/40 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md hover:border-theme-200 transition-all active:scale-95"
+                className="glass-card p-4 rounded-2xl flex flex-col items-center gap-2 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md hover:border-theme-200 transition-all active:scale-95"
                >
                    <span className="text-2xl">{c.icon}</span>
                    <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 text-center">{c.label}</span>
@@ -1660,7 +1660,7 @@ const App: React.FC = () => {
       setMemories(prev => {
           const exists = prev.find(m => m.id === mem.id);
           const newList = exists ? prev.map(m => m.id === mem.id ? mem : m) : [mem, ...prev];
-          // SORT: Newest date first
+          // SORT: Newest date first (Strict Sort)
           return newList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       });
       await dbService.saveMemory(mem);
@@ -1684,7 +1684,7 @@ const App: React.FC = () => {
        setPlans(prev => {
            const exists = prev.find(item => item.id === p.id);
            const newList = exists ? prev.map(item => item.id === p.id ? p : item) : [...prev, p];
-           // SORT: Closest date first
+           // SORT: Closest date first (Strict Sort)
            return newList.sort((a, b) => new Date(a.targetDate).getTime() - new Date(b.targetDate).getTime());
        });
        await dbService.savePlan(p);
