@@ -19,55 +19,55 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onChangeView, children }) 
   ];
 
   return (
-    <div className="flex flex-col h-screen w-full relative overflow-hidden bg-white dark:bg-slate-950">
+    <div className="flex flex-col h-[100dvh] w-full relative overflow-hidden bg-white dark:bg-slate-950">
       {/* Main Content Area */}
       {/* Added pt-[calc(env(safe-area-inset-top)+1rem)] to ensure content starts below Dynamic Island */}
       <div 
-        className="flex-1 overflow-y-auto pb-24 relative z-10 scroll-smooth no-scrollbar"
+        className="flex-1 overflow-y-auto pb-32 relative z-10 scroll-smooth no-scrollbar"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1rem)' }} 
       >
         {children}
       </div>
 
-      {/* Bottom Navigation Glass Bar */}
-      <div className="fixed bottom-0 left-0 w-full z-50 px-2 pb-4 pt-2 mb-[env(safe-area-inset-bottom)]">
-        <div className="glass rounded-3xl shadow-lg border border-white/40 dark:border-white/10">
-          <div className="flex justify-between items-center px-2 py-2">
+      {/* Bottom Navigation Bar - Full Width Fixed */}
+      <div className="fixed bottom-0 left-0 w-full z-50 glass border-t border-slate-200/50 dark:border-slate-800/50 pb-[env(safe-area-inset-bottom)] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl transition-all">
+        <div className="flex justify-between items-center px-2 py-3">
             {navItems.map((item, index) => {
               const isActive = currentView === item.id;
-              // We use inline styles for the active color to ensure it matches the user-selected theme immediately
-              const activeStyle = isActive ? {
-                color: 'rgb(var(--theme-rgb))'
-              } : {};
-              
               const isCenter = index === 2; // Home is now at index 2
 
               return (
                 <button
                   key={item.id}
                   onClick={() => onChangeView(item.id)}
-                  className={`flex flex-col items-center gap-1 transition-all duration-300 w-full ${
-                    isActive ? 'transform -translate-y-1' : 'opacity-60 hover:opacity-100'
+                  className={`flex flex-col items-center justify-center gap-1 transition-all duration-300 flex-1 ${
+                    isActive ? '' : 'opacity-60 hover:opacity-100 text-slate-500 dark:text-slate-400'
                   }`}
+                  style={isActive && !isCenter ? { color: 'rgb(var(--theme-rgb))' } : {}}
                 >
                   <div 
-                    className={`p-2 rounded-2xl transition-all duration-300 ${
-                      isActive ? 'shadow-lg' : 'text-slate-500 dark:text-slate-400'
-                    } ${isCenter ? 'scale-110' : ''}`}
-                    style={isActive ? { backgroundColor: 'rgb(var(--theme-rgb))', color: 'white', boxShadow: '0 4px 14px 0 rgba(var(--theme-rgb), 0.39)' } : {}}
+                    className={`transition-all duration-300 flex items-center justify-center ${
+                       isCenter 
+                        ? `w-12 h-12 rounded-full shadow-lg ${isActive ? 'scale-105 shadow-theme-500/40' : ''}` 
+                        : ''
+                    }`}
+                    style={isCenter ? { backgroundColor: 'rgb(var(--theme-rgb))', color: 'white' } : {}}
                   >
-                    <item.icon size={isCenter ? 24 : 20} fill={isActive && item.id === AppView.HOME ? "currentColor" : "none"} strokeWidth={2.5} />
+                    <item.icon 
+                        size={24} 
+                        fill={isActive && item.id === AppView.HOME ? "currentColor" : "none"} 
+                        strokeWidth={2.5} 
+                    />
                   </div>
-                  <span 
-                    className={`text-[9px] font-bold ${isActive ? '' : 'text-slate-500 dark:text-slate-500'}`}
-                    style={activeStyle}
-                  >
-                    {item.label}
-                  </span>
+                  
+                  {!isCenter && (
+                      <span className="text-[10px] font-bold leading-none">
+                        {item.label}
+                      </span>
+                  )}
                 </button>
               );
             })}
-          </div>
         </div>
       </div>
     </div>
