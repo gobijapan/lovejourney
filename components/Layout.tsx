@@ -22,7 +22,7 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onChangeView, children }) 
   return (
     <div className="flex flex-col h-[100dvh] w-full relative overflow-hidden transition-colors duration-500">
       {/* Main Content Area */}
-      {/* Added safe padding bottom (pb-24) to ensure content clears the fixed dock completely */}
+      {/* Adjusted padding-top and padding-bottom for perfect fit without clipping */}
       <div 
         className="flex-1 w-full overflow-y-auto pb-24 relative z-10 scroll-smooth no-scrollbar"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1.5rem)' }} 
