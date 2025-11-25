@@ -22,16 +22,18 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onChangeView, children }) 
   return (
     <div className="flex flex-col h-[100dvh] w-full relative overflow-hidden transition-colors duration-500">
       {/* Main Content Area */}
-      {/* Adjusted padding-top and padding-bottom for perfect fit without clipping */}
+      {/* Sử dụng biến env() để đảm bảo nội dung luôn nằm dưới Dynamic Island và trên thanh Dock */}
+      {/* Increased padding bottom to pb-8 to work in conjunction with spacers in views */}
       <div 
-        className="flex-1 w-full overflow-y-auto pb-24 relative z-10 scroll-smooth no-scrollbar"
-        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1.5rem)' }} 
+        className="flex-1 w-full overflow-y-auto relative z-10 scroll-smooth no-scrollbar"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 5rem)' }} 
       >
         {children}
       </div>
 
       {/* Bottom Navigation Bar - Full Width Fixed */}
-      <div className="fixed bottom-0 left-0 w-full z-50 glass border-t border-white/20 dark:border-white/10 pb-[env(safe-area-inset-bottom)] bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl transition-all">
+      {/* Áp dụng padding-bottom dựa trên safe-area-inset-bottom để tránh thanh Home ảo */}
+      <div className="fixed bottom-0 left-0 w-full z-50 glass border-t border-white/20 dark:border-white/10 pb-[env(safe-area-inset-bottom)] bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl transition-all shadow-[0_-5px_20px_rgba(0,0,0,0.05)]">
         <div className="flex justify-around items-end w-full px-1">
             {navItems.map((item, index) => {
               const isActive = currentView === item.id;
@@ -62,7 +64,7 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onChangeView, children }) 
                   </div>
                   
                   {!isCenter && (
-                      <span className={`text-[10px] font-bold leading-none mt-1 ${isActive ? 'scale-105' : ''}`}>
+                      <span className={`text-[10px] font-bold leading-none mt-1 ${isActive ? 'scale-110' : ''}`}>
                         {item.label}
                       </span>
                   )}
