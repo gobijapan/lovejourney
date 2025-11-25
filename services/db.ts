@@ -1,3 +1,4 @@
+
 // IndexedDB Wrapper to handle large storage limits (PWA friendly)
 import { CoupleData, Memory, PlanItem } from "../types";
 
@@ -110,5 +111,49 @@ export const dbService = {
          transaction.objectStore(STORES.DATA).clear();
          transaction.objectStore(STORES.MEMORIES).clear();
          transaction.objectStore(STORES.PLANS).clear();
+         return new Promise<void>((resolve, reject) => {
+            transaction.oncomplete = () => resolve();
+            transaction.onerror = () => reject(transaction.error);
+         });
+    },
+
+    // Export all data for backup
+    exportData: async () => {
+        const settings = await dbService.getSettings();
+        const memories = await dbService.getAll<Memory>(STORES.MEMORIES);
+        const plans = await dbService.getAll<PlanItem>(STORES.PLANS);
+        
+        return {
+            version: 1,
+            timestamp: new Date().toISOString(),
+            data: {
+                settings,
+                memories,
+                plans
+            }
+        };
+    },
+
+    // Import data from backup
+    importData: async (backupData: any) => {
+        if (!backupData || !backupData.data) throw new Error("File sao lưu không hợp lệ");
+        
+        // Clear existing data first
+        await dbService.clearAll();
+
+        const { settings, memories, plans } = backupData.data;
+
+        // Restore Settings
+        if (settings) await dbService.saveSettings(settings);
+
+        // Restore Memories
+        if (Array.isArray(memories)) {
+            for (const m of memories) await dbService.saveMemory(m);
+        }
+
+        // Restore Plans
+        if (Array.isArray(plans)) {
+            for (const p of plans) await dbService.savePlan(p);
+        }
     }
 };
