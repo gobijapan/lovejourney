@@ -1,7 +1,9 @@
+
 export interface CoupleData {
   startDate: string; // ISO Date string
   bgImage: string | null; // Base64 or URL
   bgOpacity: number; // 0.1 to 1.0
+  cardOpacity?: number; // 0.1 to 1.0 - New setting
   partner1Name: string;
   partner2Name: string;
   partner1Dob: string;
