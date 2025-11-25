@@ -40,6 +40,7 @@ const DEFAULT_DATA: CoupleData = {
   startDate: new Date().toISOString(),
   bgImage: null,
   bgOpacity: 0.6,
+  cardOpacity: 0.6, // Default opacity for cards
   partner1Name: "Anh",
   partner2Name: "Em",
   partner1Dob: "",
@@ -666,7 +667,7 @@ const MemoriesView: React.FC<{
                                 <div className="absolute -left-[9px] top-6 w-4 h-4 rounded-full bg-theme-500 border-4 border-white dark:border-slate-950"></div>
                                 <span className="text-xs font-bold text-slate-400 mb-1 block uppercase">{formatDateVN(mem.date)}</span>
                                 
-                                <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
+                                <div className="glass-card bg-white/40 dark:bg-slate-800/40 p-4 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
                                     <div className="flex justify-between items-start">
                                         <h3 className="font-bold text-slate-800 dark:text-white mb-2 text-lg">{mem.title}</h3>
                                         <div className="flex gap-2">
@@ -931,7 +932,7 @@ const PlansView: React.FC<PlansViewProps> = ({ fontStyle, plans, onSavePlan, onD
                 {filteredPlans.map(plan => {
                     const days = getDaysLeft(plan.targetDate);
                     return (
-                        <div key={plan.id} className={`p-4 rounded-2xl border transition-all ${plan.completed ? 'bg-green-50 dark:bg-green-900/10 border-green-200' : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 shadow-sm'}`}>
+                        <div key={plan.id} className={`glass-card p-4 rounded-2xl border transition-all ${plan.completed ? 'bg-green-50/50 dark:bg-green-900/10 border-green-200' : 'bg-white/40 dark:bg-slate-800/40 border-slate-100 dark:border-slate-700 shadow-sm'}`}>
                             <div className="flex items-start justify-between mb-2">
                                 <div className="flex-1">
                                     <div className="flex items-center gap-2 mb-1">
@@ -988,11 +989,12 @@ const PlacesView: React.FC<{ fontStyle: string }> = ({ fontStyle }) => {
 
     navigator.geolocation.getCurrentPosition((position) => {
         const link = getGoogleMapsLink(position.coords.latitude, position.coords.longitude, selectedCategory);
-        window.open(link, '_blank');
-        setSelectedCategory(null); // Close modal
+        // Changed from window.open to window.location.href for better iOS PWA deep linking
+        window.location.href = link; 
+        setSelectedCategory(null);
     }, () => {
         alert("Không lấy được vị trí. Sẽ mở Google Maps mặc định.");
-        window.open(`https://www.google.com/maps/search/${encodeURIComponent(selectedCategory)}`, '_blank');
+        window.location.href = `https://www.google.com/maps/search/${encodeURIComponent(selectedCategory)}`;
         setSelectedCategory(null);
     });
   };
@@ -1028,7 +1030,7 @@ const PlacesView: React.FC<{ fontStyle: string }> = ({ fontStyle }) => {
                <button 
                 key={c.id} 
                 onClick={() => setSelectedCategory(c.id)}
-                className="p-4 rounded-2xl flex flex-col items-center gap-2 bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md hover:border-theme-200 transition-all active:scale-95"
+                className="glass-card p-4 rounded-2xl flex flex-col items-center gap-2 bg-white/40 dark:bg-slate-800/40 shadow-sm border border-slate-100 dark:border-slate-700 hover:shadow-md hover:border-theme-200 transition-all active:scale-95"
                >
                    <span className="text-2xl">{c.icon}</span>
                    <span className="text-[10px] font-bold text-slate-600 dark:text-slate-300 text-center">{c.label}</span>
@@ -1284,7 +1286,7 @@ const SettingsView: React.FC<{
       {/* Theme & Display */}
       <section className="space-y-4">
         <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1 flex items-center gap-2"><Palette size={12}/> Giao diện</h3>
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm space-y-4">
+        <div className="glass-card bg-white/50 dark:bg-slate-800/50 rounded-2xl p-4 shadow-sm space-y-4">
             {/* Dark Mode */}
             <div className="flex items-center justify-between">
                 <span className="text-sm font-medium dark:text-white">Chế độ tối</span>
@@ -1363,7 +1365,7 @@ const SettingsView: React.FC<{
                      )}
                      
                      <div className="w-20 ml-2 flex flex-col items-end">
-                        <span className="text-[8px] text-slate-400 mb-0.5">Độ mờ: {Math.round((data.bgOpacity || 0.6)*100)}%</span>
+                        <span className="text-[8px] text-slate-400 mb-0.5">Mờ nền: {Math.round((data.bgOpacity || 0.6)*100)}%</span>
                         <input 
                             type="range" min="0.1" max="1" step="0.1" 
                             value={data.bgOpacity || 0.6} 
@@ -1372,6 +1374,20 @@ const SettingsView: React.FC<{
                         />
                      </div>
                  </div>
+             </div>
+
+             {/* Card Opacity Control */}
+             <div className="pt-2 border-t border-slate-100 dark:border-slate-700">
+                 <div className="flex justify-between items-center mb-1">
+                    <span className="text-sm font-medium dark:text-white">Độ mờ thẻ</span>
+                    <span className="text-xs text-slate-500">{Math.round((data.cardOpacity ?? 0.6) * 100)}%</span>
+                 </div>
+                 <input 
+                    type="range" min="0.1" max="1" step="0.05"
+                    value={data.cardOpacity ?? 0.6}
+                    onChange={(e) => handleUpdate('cardOpacity', parseFloat(e.target.value))}
+                    className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-theme-500"
+                 />
              </div>
         </div>
       </section>
@@ -1438,7 +1454,7 @@ const SettingsView: React.FC<{
       {/* Couple Info */}
       <section className="space-y-4">
         <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1 flex items-center gap-2"><LayoutTemplate size={12}/> Thông tin cặp đôi</h3>
-        <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm space-y-6">
+        <div className="glass-card bg-white/50 dark:bg-slate-800/50 rounded-2xl p-4 shadow-sm space-y-6">
             <div className="flex items-center justify-between">
                  <span className="text-sm font-medium dark:text-white">Chi tiết Giờ/Phút/Giây</span>
                  <div onClick={() => handleUpdate('showTimeDetails', !data.showTimeDetails)} className={`w-10 h-5 rounded-full relative transition-colors cursor-pointer ${data.showTimeDetails ? 'bg-theme-500' : 'bg-slate-300'}`}>
@@ -1485,7 +1501,7 @@ const SettingsView: React.FC<{
       {/* Notifications */}
       <section className="space-y-4">
         <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1 flex items-center gap-2"><BellRing size={12}/> Nhắc nhở</h3>
-         <div className="bg-white dark:bg-slate-800 rounded-2xl p-4 shadow-sm space-y-4">
+         <div className="glass-card bg-white/50 dark:bg-slate-800/50 rounded-2xl p-4 shadow-sm space-y-4">
              <div className="space-y-3 pb-4 border-b border-slate-100 dark:border-slate-700">
                  {['anniversary', 'valentine', 'holidays', 'onThisDay'].map(k => (
                      <div key={k} className="flex items-center justify-between">
@@ -1638,6 +1654,8 @@ const App: React.FC = () => {
         dbService.saveSettings(data).then(() => {
              const rgb = hexToRgb(data.themeColor || '#fa3452');
              document.documentElement.style.setProperty('--theme-rgb', rgb);
+             // Sync Card Opacity to CSS Variable
+             document.documentElement.style.setProperty('--card-opacity', String(data.cardOpacity || 0.6));
         });
     }
   }, [data, loading]);
