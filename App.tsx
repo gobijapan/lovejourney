@@ -12,7 +12,7 @@ import {
   calculateDetailedTime, getNextMilestone, getZodiacSign, formatDateVN, hexToRgb
 } from './utils/helpers';
 import { 
-  Calendar, MapPin, CheckCircle2, Lock, Heart, Trash2, Sun, Image as ImageIcon, Plus, Clock, Pin, X, Shield, LogOut, Palette, LayoutTemplate, Edit2, Search, AlertCircle, Camera, BellRing, Bell, History, Sliders, ChevronDown, Share, Loader2, Play, ExternalLink, Navigation, AlertTriangle, MessageSquare
+  Calendar, MapPin, CheckCircle2, Lock, Heart, Trash2, Sun, Image as ImageIcon, Plus, Clock, Pin, X, Shield, LogOut, Palette, LayoutTemplate, Edit2, Search, AlertCircle, Camera, BellRing, Bell, History, Sliders, ChevronDown, Share, Loader2, Play, ExternalLink, Navigation, AlertTriangle, MessageSquare, Download, Upload, ChevronLeft, ChevronRight
 } from 'lucide-react';
 
 // --- THEME CONSTANTS ---
@@ -97,7 +97,7 @@ const resizeImage = (base64Str: string, maxWidth = 800, quality = 0.7): Promise<
 };
 
 // --- PORTAL COMPONENT ---
-const Portal = ({ children }: { children: React.ReactNode }) => {
+const Portal = ({ children }: { children?: React.ReactNode }) => {
     return createPortal(children, document.body);
 };
 
@@ -429,8 +429,9 @@ const MemoriesView: React.FC<{
     memories: Memory[], 
     onSaveMemory: (m: Memory) => void, 
     onDeleteMemory: (id: string) => void,
-    onUpdateMemory: (m: Memory) => void 
-}> = ({ fontStyle, memories, onSaveMemory, onDeleteMemory, onUpdateMemory }) => {
+    onUpdateMemory: (m: Memory) => void,
+    onOpenMedia: (images: string[], index: number) => void
+}> = ({ fontStyle, memories, onSaveMemory, onDeleteMemory, onUpdateMemory, onOpenMedia }) => {
   const [activeTab, setActiveTab] = useState<'timeline' | 'gallery'>('timeline');
 
   const [showForm, setShowForm] = useState(false);
@@ -442,7 +443,6 @@ const MemoriesView: React.FC<{
   const [formImages, setFormImages] = useState<string[]>([]);
   const [formDate, setFormDate] = useState(new Date().toISOString().split('T')[0]);
   
-  const [selectedMedia, setSelectedMedia] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const handleImageSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -453,7 +453,7 @@ const MemoriesView: React.FC<{
           return;
       }
       
-      const files = Array.from(fileList);
+      const files = Array.from(fileList) as File[];
       const processed: string[] = [];
       
       for(const file of files) {
@@ -540,7 +540,6 @@ const MemoriesView: React.FC<{
               const updatedMediaUrl = parentMem.mediaUrl === mediaUrl ? undefined : parentMem.mediaUrl;
               const updatedMem = { ...parentMem, images: updatedImages, mediaUrl: updatedMediaUrl };
               onUpdateMemory(updatedMem);
-              setSelectedMedia(null);
           }
       }
       setDeleteConfirm(null);
@@ -570,6 +569,10 @@ const MemoriesView: React.FC<{
       }
   }
 
+  const allGalleryImages = useMemo(() => {
+    return memories.flatMap(m => m.images || (m.mediaUrl ? [m.mediaUrl] : []));
+  }, [memories]);
+
   return (
     <div className={`flex flex-col h-full pt-10 px-4 ${FONTS[fontStyle] || FONTS.sans}`}>
       <div className="flex justify-between items-center mb-6">
@@ -591,37 +594,6 @@ const MemoriesView: React.FC<{
           onCancel={() => setDeleteConfirm(null)}
       />
 
-      {/* Media Lightbox */}
-      {selectedMedia && (
-          <Portal>
-            <div className="fixed inset-0 z-[100] bg-black flex items-center justify-center">
-                <div 
-                    className="absolute top-0 left-0 w-full p-4 flex justify-between items-start z-[110] bg-gradient-to-b from-black/80 via-black/40 to-transparent"
-                    style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1rem)' }}
-                >
-                    <button className="text-white p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 active:scale-95 transition-all" onClick={() => setSelectedMedia(null)}><X size={24}/></button>
-                    
-                    {activeTab === 'gallery' && (
-                        <button 
-                            className="text-white bg-red-500/80 hover:bg-red-500 p-3 rounded-full backdrop-blur-md shadow-lg active:scale-95 transition-all"
-                            onClick={(e) => { e.stopPropagation(); requestDeleteMedia(selectedMedia); }}
-                        >
-                            <Trash2 size={24}/>
-                        </button>
-                    )}
-                </div>
-
-                <div className="relative w-full h-full flex items-center justify-center" onClick={() => setSelectedMedia(null)}>
-                    {selectedMedia.startsWith('data:video') ? (
-                         <video src={selectedMedia} controls className="max-w-full max-h-full" onClick={e => e.stopPropagation()} />
-                    ) : (
-                         <img src={selectedMedia} className="max-w-full max-h-full object-contain" onClick={e => e.stopPropagation()}/>
-                    )}
-                </div>
-            </div>
-          </Portal>
-      )}
-
       {/* FORM MODAL */}
       {showForm && (
         <Portal>
@@ -634,7 +606,7 @@ const MemoriesView: React.FC<{
                     
                     <div className="flex-1 overflow-y-auto p-6 space-y-4">
                         <input type="text" placeholder="Tiêu đề..." className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none text-sm font-bold dark:text-white" value={formTitle} onChange={(e) => setFormTitle(e.target.value)} />
-                        <input type="date" className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none text-sm dark:text-white" value={formDate} onChange={(e) => setFormDate(e.target.value)} />
+                        <input type="date" className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none text-sm dark:text-white h-[46px] appearance-none" value={formDate} onChange={(e) => setFormDate(e.target.value)} />
                         <textarea placeholder="Chi tiết..." className="w-full p-3 bg-slate-50 dark:bg-slate-900 rounded-xl outline-none text-sm min-h-[100px] resize-none dark:text-white" value={formContent} onChange={(e) => setFormContent(e.target.value)} />
                         
                         <div className="grid grid-cols-3 gap-2">
@@ -680,6 +652,8 @@ const MemoriesView: React.FC<{
                      const prevMonthKey = prevMemDate && !isNaN(prevMemDate.getTime()) ? `${prevMemDate.getMonth() + 1}/${prevMemDate.getFullYear()}` : '';
                      const showHeader = index === 0 || currentMonthKey !== prevMonthKey;
 
+                     const memImages = mem.images || (mem.mediaUrl ? [mem.mediaUrl] : []);
+
                      return (
                         <div key={mem.id} className="relative px-2">
                              {showHeader && (
@@ -702,10 +676,10 @@ const MemoriesView: React.FC<{
                                         </div>
                                     </div>
                                     
-                                    {mem.images && mem.images.length > 0 && (
-                                        <div className={`grid gap-1 mb-3 rounded-xl overflow-hidden ${mem.images.length === 1 ? 'grid-cols-1' : mem.images.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
-                                            {mem.images.slice(0, 9).map((media, i) => (
-                                                <div key={i} className="aspect-square cursor-pointer relative bg-black" onClick={() => setSelectedMedia(media)}>
+                                    {memImages.length > 0 && (
+                                        <div className={`grid gap-1 mb-3 rounded-xl overflow-hidden ${memImages.length === 1 ? 'grid-cols-1' : memImages.length === 2 ? 'grid-cols-2' : 'grid-cols-3'}`}>
+                                            {memImages.slice(0, 9).map((media, i) => (
+                                                <div key={i} className="aspect-square cursor-pointer relative bg-black" onClick={() => onOpenMedia(memImages, i)}>
                                                     {media.startsWith('data:video') ? (
                                                         <>
                                                             <video src={media} className="w-full h-full object-cover opacity-90" />
@@ -718,9 +692,6 @@ const MemoriesView: React.FC<{
                                             ))}
                                         </div>
                                     )}
-                                    {!mem.images && mem.mediaUrl && (
-                                        <img src={mem.mediaUrl} className="w-full rounded-xl mb-3 object-cover" onClick={() => setSelectedMedia(mem.mediaUrl!)}/>
-                                    )}
                                     
                                     {mem.content && <p className="text-slate-600 dark:text-slate-300 text-sm whitespace-pre-wrap leading-relaxed">{mem.content}</p>}
                                 </div>
@@ -732,8 +703,8 @@ const MemoriesView: React.FC<{
         )}
         {activeTab === 'gallery' && (
              <div className="grid grid-cols-3 gap-1">
-             {memories.flatMap(m => (m.images || (m.mediaUrl ? [m.mediaUrl] : []))).map((media, i) => (
-                 <div key={i} className="aspect-square overflow-hidden cursor-pointer relative bg-black" onClick={() => setSelectedMedia(media)}>
+             {allGalleryImages.map((media, i) => (
+                 <div key={i} className="aspect-square overflow-hidden cursor-pointer relative bg-black" onClick={() => onOpenMedia(allGalleryImages, i)}>
                      {media.startsWith('data:video') ? (
                         <>
                             <video src={media} className="w-full h-full object-cover opacity-90" />
@@ -743,6 +714,12 @@ const MemoriesView: React.FC<{
                      ) : (
                         <img src={media} className="w-full h-full object-cover transition-transform duration-300 hover:scale-110" />
                      )}
+                     <button 
+                        className="absolute top-1 right-1 bg-red-500/80 text-white p-1 rounded-full opacity-0 hover:opacity-100 transition-opacity"
+                        onClick={(e) => { e.stopPropagation(); requestDeleteMedia(media); }}
+                    >
+                        <Trash2 size={12}/>
+                    </button>
                  </div>
              ))}
           </div>
@@ -929,7 +906,7 @@ const PlansView: React.FC<PlansViewProps> = ({ fontStyle, plans, onSavePlan, onD
 
                             <textarea placeholder="Chi tiết (tùy chọn)..." className="w-full mb-3 p-3 bg-slate-100 dark:bg-slate-900 rounded-lg outline-none text-sm min-h-[80px] dark:text-white" value={formDesc} onChange={e => setFormDesc(e.target.value)} />
                             <label className="text-xs text-slate-500 block mb-1">Ngày dự kiến</label>
-                            <input type="date" className="w-full mb-4 p-3 bg-slate-100 dark:bg-slate-900 rounded-lg outline-none dark:text-white" value={formDate} onChange={e => setFormDate(e.target.value)} />
+                            <input type="date" className="w-full mb-4 p-3 bg-slate-100 dark:bg-slate-900 rounded-lg outline-none dark:text-white h-[46px] appearance-none" value={formDate} onChange={e => setFormDate(e.target.value)} />
                             
                             <div className="bg-slate-50 dark:bg-slate-900 p-3 rounded-lg mb-4">
                                 <div className="flex items-center justify-between mb-2">
@@ -1188,6 +1165,7 @@ const SettingsView: React.FC<{
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const avatar1Ref = useRef<HTMLInputElement>(null);
   const avatar2Ref = useRef<HTMLInputElement>(null);
+  const backupInputRef = useRef<HTMLInputElement>(null);
   
   const [showPinModal, setShowPinModal] = useState(false);
   const [pinMode, setPinMode] = useState<'setup' | 'verify'>('setup');
@@ -1254,6 +1232,51 @@ const SettingsView: React.FC<{
       return memories.flatMap(m => m.images || (m.mediaUrl ? [m.mediaUrl] : []));
   }, [memories]);
 
+  // BACKUP FUNCTIONALITY
+  const handleBackup = async () => {
+      try {
+          const exportData = await dbService.exportData();
+          const jsonString = JSON.stringify(exportData, null, 2);
+          const blob = new Blob([jsonString], { type: 'application/json' });
+          const url = URL.createObjectURL(blob);
+          
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `lovejourney_backup_${new Date().toISOString().split('T')[0]}.json`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+      } catch (e) {
+          alert("Có lỗi khi sao lưu dữ liệu.");
+          console.error(e);
+      }
+  };
+
+  // RESTORE FUNCTIONALITY
+  const handleRestore = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if(!file) return;
+
+      if(confirm("CẢNH BÁO: Dữ liệu hiện tại sẽ bị ghi đè hoàn toàn bởi bản sao lưu. Bạn có chắc chắn không?")) {
+          const reader = new FileReader();
+          reader.onload = async (event) => {
+              try {
+                  const json = JSON.parse(event.target?.result as string);
+                  await dbService.importData(json);
+                  alert("Khôi phục thành công! Ứng dụng sẽ tải lại.");
+                  window.location.reload();
+              } catch (err) {
+                  alert("File sao lưu không hợp lệ.");
+                  console.error(err);
+              }
+          };
+          reader.readAsText(file);
+      }
+      // Reset input
+      if(backupInputRef.current) backupInputRef.current.value = "";
+  };
+
   return (
     <div className={`p-6 pt-10 max-w-md mx-auto space-y-8 ${FONTS[data.fontStyle] || FONTS.sans}`}>
       <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Cài Đặt</h2>
@@ -1310,56 +1333,45 @@ const SettingsView: React.FC<{
                 </div>
             </div>
             
-            {/* Background Image */}
-             <div>
-                <div className="flex items-center justify-between mb-2">
+            {/* Background Image - Compact Row */}
+             <div className="flex items-center justify-between">
+                 <div className="flex flex-col">
                      <span className="text-sm font-medium dark:text-white">Hình nền</span>
-                     <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-slate-400 uppercase">Toàn app</span>
-                         <div onClick={() => handleUpdate('globalBackground', !data.globalBackground)} className={`w-8 h-4 rounded-full relative transition-colors cursor-pointer ${data.globalBackground ? 'bg-theme-500' : 'bg-slate-300'}`}>
-                            <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform ${data.globalBackground ? 'translate-x-4' : 'translate-x-0'}`}></div>
+                     <div className="flex items-center gap-2 mt-1">
+                        <div onClick={() => handleUpdate('globalBackground', !data.globalBackground)} className={`w-6 h-3 rounded-full relative transition-colors cursor-pointer ${data.globalBackground ? 'bg-theme-500' : 'bg-slate-300'}`}>
+                            <div className={`absolute top-0.5 left-0.5 w-2 h-2 bg-white rounded-full transition-transform ${data.globalBackground ? 'translate-x-3' : 'translate-x-0'}`}></div>
                         </div>
+                        <span className="text-[10px] text-slate-400">Toàn app</span>
                      </div>
-                </div>
-                
-                <div 
-                    className="w-full h-36 rounded-xl bg-slate-100 dark:bg-slate-700 overflow-hidden relative border-2 border-dashed border-slate-300 dark:border-slate-600 mb-2 cursor-pointer group"
-                    onClick={() => setShowBgOptions(true)}
-                >
-                    {data.bgImage ? (
-                        <>
-                            <img src={data.bgImage} className="w-full h-full object-cover" />
-                            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                <span className="text-white font-bold text-xs bg-black/50 px-3 py-1 rounded-full">Thay đổi</span>
-                            </div>
+                 </div>
+                 
+                 <div className="flex items-center gap-2">
+                     {data.bgImage ? (
+                        <div className="relative w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-600 group cursor-pointer" onClick={() => setShowBgOptions(true)}>
+                            <img src={data.bgImage} className="w-full h-full object-cover"/>
                             <button 
                                 onClick={(e) => { e.stopPropagation(); handleUpdate('bgImage', null); }}
-                                className="absolute top-2 right-2 bg-black/50 hover:bg-red-500 text-white p-1 rounded-full backdrop-blur-sm transition-colors"
+                                className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 flex items-center justify-center text-white transition-opacity"
                             >
                                 <X size={14}/>
                             </button>
-                        </>
-                    ) : (
-                        <div className="flex flex-col items-center justify-center h-full text-slate-400">
-                            <ImageIcon size={24} />
-                            <span className="text-xs mt-1">Chạm để chọn ảnh</span>
                         </div>
-                    )}
-                </div>
-                
-                <div className="flex items-center gap-2 mb-3">
-                    <Sliders size={14} className="text-slate-400"/>
-                    <input 
-                        type="range" 
-                        min="0.1" 
-                        max="1" 
-                        step="0.1" 
-                        value={data.bgOpacity || 0.6} 
-                        onChange={(e) => handleUpdate('bgOpacity', parseFloat(e.target.value))}
-                        className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-theme-500"
-                    />
-                    <span className="text-[10px] text-slate-500 w-8">{Math.round((data.bgOpacity || 0.6)*100)}%</span>
-                </div>
+                     ) : (
+                         <button onClick={() => setShowBgOptions(true)} className="px-3 py-1.5 bg-slate-100 dark:bg-slate-700 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-300">
+                             Chọn ảnh
+                         </button>
+                     )}
+                     
+                     <div className="w-20 ml-2 flex flex-col items-end">
+                        <span className="text-[8px] text-slate-400 mb-0.5">Độ mờ: {Math.round((data.bgOpacity || 0.6)*100)}%</span>
+                        <input 
+                            type="range" min="0.1" max="1" step="0.1" 
+                            value={data.bgOpacity || 0.6} 
+                            onChange={(e) => handleUpdate('bgOpacity', parseFloat(e.target.value))}
+                            className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-theme-500"
+                        />
+                     </div>
+                 </div>
              </div>
         </div>
       </section>
@@ -1436,7 +1448,7 @@ const SettingsView: React.FC<{
             
             <div className="bg-slate-50 dark:bg-slate-900 p-3 rounded-xl">
               <label className="text-xs text-slate-500 block mb-1 font-bold">Ngày bắt đầu yêu</label>
-              <input type="date" value={!isNaN(new Date(data.startDate).getTime()) ? data.startDate.split('T')[0] : new Date().toISOString().split('T')[0]} onChange={(e) => handleUpdate('startDate', new Date(e.target.value).toISOString())} className="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 pb-1 mb-3 text-sm outline-none dark:text-white" />
+              <input type="date" value={!isNaN(new Date(data.startDate).getTime()) ? data.startDate.split('T')[0] : new Date().toISOString().split('T')[0]} onChange={(e) => handleUpdate('startDate', new Date(e.target.value).toISOString())} className="w-full bg-transparent border-b border-slate-200 dark:border-slate-700 pb-1 mb-3 text-sm outline-none dark:text-white h-[46px] appearance-none" />
               
               <div className="flex items-center justify-between">
                    <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Đếm từ ngày số 1</span>
@@ -1455,7 +1467,7 @@ const SettingsView: React.FC<{
                     </div>
                     <input type="file" ref={avatar1Ref} className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'partner1Avatar')}/>
                     <input type="text" value={data.partner1Name} onChange={(e) => handleUpdate('partner1Name', e.target.value)} className="w-full text-center text-sm font-bold bg-transparent border-b border-slate-200 dark:border-slate-700 outline-none pb-1 dark:text-white" placeholder="Tên bạn"/>
-                     <input type="date" value={data.partner1Dob} onChange={(e) => handleUpdate('partner1Dob', e.target.value)} className="w-full text-center text-[10px] bg-transparent outline-none text-slate-500"/>
+                     <input type="date" value={data.partner1Dob} onChange={(e) => handleUpdate('partner1Dob', e.target.value)} className="w-full text-center text-[10px] bg-transparent outline-none text-slate-500 h-[30px] appearance-none"/>
                 </div>
                  <div className="space-y-2">
                     <div className="relative w-16 h-16 mx-auto rounded-full bg-slate-200 overflow-hidden group cursor-pointer" onClick={() => avatar2Ref.current?.click()}>
@@ -1464,7 +1476,7 @@ const SettingsView: React.FC<{
                     </div>
                     <input type="file" ref={avatar2Ref} className="hidden" accept="image/*" onChange={(e) => handleFileUpload(e, 'partner2Avatar')}/>
                     <input type="text" value={data.partner2Name} onChange={(e) => handleUpdate('partner2Name', e.target.value)} className="w-full text-center text-sm font-bold bg-transparent border-b border-slate-200 dark:border-slate-700 outline-none pb-1 dark:text-white" placeholder="Tên người ấy"/>
-                    <input type="date" value={data.partner2Dob} onChange={(e) => handleUpdate('partner2Dob', e.target.value)} className="w-full text-center text-[10px] bg-transparent outline-none text-slate-500"/>
+                    <input type="date" value={data.partner2Dob} onChange={(e) => handleUpdate('partner2Dob', e.target.value)} className="w-full text-center text-[10px] bg-transparent outline-none text-slate-500 h-[30px] appearance-none"/>
                 </div>
             </div>
         </div>
@@ -1530,6 +1542,20 @@ const SettingsView: React.FC<{
         expectedPin={data.securityPin || undefined}
       />
       
+      {/* Backup & Restore */}
+      <section className="space-y-4">
+          <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1 flex items-center gap-2"><Download size={12}/> Dữ liệu</h3>
+          <div className="flex gap-3">
+              <button onClick={handleBackup} className="flex-1 py-3 bg-slate-100 dark:bg-slate-700 rounded-2xl font-bold text-slate-600 dark:text-slate-300 text-sm flex items-center justify-center gap-2">
+                  <Download size={16}/> Sao lưu
+              </button>
+              <button onClick={() => backupInputRef.current?.click()} className="flex-1 py-3 bg-slate-100 dark:bg-slate-700 rounded-2xl font-bold text-slate-600 dark:text-slate-300 text-sm flex items-center justify-center gap-2">
+                  <Upload size={16}/> Khôi phục
+              </button>
+              <input type="file" ref={backupInputRef} onChange={handleRestore} className="hidden" accept=".json"/>
+          </div>
+      </section>
+
       {/* Feedback Button - Updated to open Google Forms */}
       <button 
         onClick={() => window.open("https://forms.gle/wT55A8TRhxq6ukdi6", "_blank")}
@@ -1560,6 +1586,11 @@ const App: React.FC = () => {
   const [showResetAuth, setShowResetAuth] = useState(false);
   const [plans, setPlans] = useState<PlanItem[]>([]);
   const [memories, setMemories] = useState<Memory[]>([]);
+  
+  // LIGHTBOX STATE
+  const [lightboxData, setLightboxData] = useState<{images: string[], index: number} | null>(null);
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
 
   useEffect(() => {
     const loadData = async () => {
@@ -1664,6 +1695,40 @@ const App: React.FC = () => {
       }
   }
 
+  // Lightbox Handlers
+  const openLightbox = (images: string[], index: number) => {
+      setLightboxData({ images, index });
+  }
+
+  const closeLightbox = () => setLightboxData(null);
+
+  const nextImage = (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      if(lightboxData && lightboxData.index < lightboxData.images.length - 1) {
+          setLightboxData({ ...lightboxData, index: lightboxData.index + 1 });
+      }
+  }
+
+  const prevImage = (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      if(lightboxData && lightboxData.index > 0) {
+          setLightboxData({ ...lightboxData, index: lightboxData.index - 1 });
+      }
+  }
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+      touchStartX.current = e.targetTouches[0].clientX;
+  }
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+      touchEndX.current = e.changedTouches[0].clientX;
+      const diff = touchStartX.current - touchEndX.current;
+      if (Math.abs(diff) > 50) { // Threshold
+          if (diff > 0) nextImage();
+          else prevImage();
+      }
+  }
+
   if (loading) {
       return (
           <div className="h-screen w-full flex flex-col items-center justify-center bg-white dark:bg-slate-950">
@@ -1747,6 +1812,7 @@ const App: React.FC = () => {
                 onSaveMemory={handleSaveMemory}
                 onDeleteMemory={handleDeleteMemory}
                 onUpdateMemory={handleUpdateMemory}
+                onOpenMedia={openLightbox}
             />
           )}
           {currentView === AppView.PLANS && (
@@ -1772,6 +1838,72 @@ const App: React.FC = () => {
               performReset();
           }}
       />
+
+       {/* Media Lightbox */}
+       {lightboxData && (
+          <Portal>
+            <div 
+                className="fixed inset-0 z-[100] bg-black flex items-center justify-center touch-none"
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
+            >
+                <div 
+                    className="absolute top-0 left-0 w-full p-4 flex justify-between items-start z-[110] bg-gradient-to-b from-black/80 via-black/40 to-transparent"
+                    style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1rem)' }}
+                >
+                    <button className="text-white p-3 bg-white/10 backdrop-blur-md rounded-full hover:bg-white/20 active:scale-95 transition-all" onClick={closeLightbox}><X size={24}/></button>
+                    <span className="text-white font-bold bg-black/40 px-3 py-1 rounded-full text-sm">
+                        {lightboxData.index + 1} / {lightboxData.images.length}
+                    </span>
+                    <button 
+                        className="text-white bg-red-500/80 hover:bg-red-500 p-3 rounded-full backdrop-blur-md shadow-lg active:scale-95 transition-all"
+                        onClick={(e) => { 
+                            e.stopPropagation(); 
+                            if(confirm("Xóa ảnh này?")) {
+                                const currentUrl = lightboxData.images[lightboxData.index];
+                                // Find which memory has this image
+                                const mem = memories.find(m => (m.images || []).includes(currentUrl) || m.mediaUrl === currentUrl);
+                                if(mem) {
+                                    const updatedImages = (mem.images || []).filter(img => img !== currentUrl);
+                                    const updatedMediaUrl = mem.mediaUrl === currentUrl ? undefined : mem.mediaUrl;
+                                    handleUpdateMemory({ ...mem, images: updatedImages, mediaUrl: updatedMediaUrl });
+                                    closeLightbox();
+                                }
+                            }
+                        }}
+                    >
+                        <Trash2 size={24}/>
+                    </button>
+                </div>
+
+                <div className="relative w-full h-full flex items-center justify-center" onClick={closeLightbox}>
+                    {lightboxData.images[lightboxData.index].startsWith('data:video') ? (
+                         <video src={lightboxData.images[lightboxData.index]} controls className="max-w-full max-h-full" onClick={e => e.stopPropagation()} />
+                    ) : (
+                         <img src={lightboxData.images[lightboxData.index]} className="max-w-full max-h-full object-contain" onClick={e => e.stopPropagation()}/>
+                    )}
+                </div>
+
+                {lightboxData.index > 0 && (
+                    <button 
+                        onClick={prevImage}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 backdrop-blur-md rounded-full text-white hover:bg-white/20 hidden md:block"
+                    >
+                        <ChevronLeft size={32}/>
+                    </button>
+                )}
+
+                {lightboxData.index < lightboxData.images.length - 1 && (
+                    <button 
+                        onClick={nextImage}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/10 backdrop-blur-md rounded-full text-white hover:bg-white/20 hidden md:block"
+                    >
+                        <ChevronRight size={32}/>
+                    </button>
+                )}
+            </div>
+          </Portal>
+      )}
     </Layout>
   );
 };
