@@ -20,19 +20,19 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onChangeView, children }) 
   ];
 
   return (
-    <div className="flex flex-col h-[100dvh] w-full relative overflow-hidden bg-white dark:bg-slate-950">
+    <div className="flex flex-col h-[100dvh] w-full relative overflow-hidden transition-colors duration-500">
       {/* Main Content Area */}
-      {/* Increased padding top and bottom for safe areas */}
+      {/* Added safe padding bottom (pb-24) to ensure content clears the fixed dock completely */}
       <div 
-        className="flex-1 overflow-y-auto pb-48 relative z-10 scroll-smooth no-scrollbar"
-        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 2rem)' }} 
+        className="flex-1 w-full overflow-y-auto pb-24 relative z-10 scroll-smooth no-scrollbar"
+        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1.5rem)' }} 
       >
         {children}
       </div>
 
       {/* Bottom Navigation Bar - Full Width Fixed */}
-      <div className="fixed bottom-0 left-0 w-full z-50 glass border-t border-slate-200/50 dark:border-slate-800/50 pb-[env(safe-area-inset-bottom)] bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl transition-all">
-        <div className="flex justify-between items-center px-2 py-3">
+      <div className="fixed bottom-0 left-0 w-full z-50 glass border-t border-white/20 dark:border-white/10 pb-[env(safe-area-inset-bottom)] bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl transition-all">
+        <div className="flex justify-around items-end w-full px-1">
             {navItems.map((item, index) => {
               const isActive = currentView === item.id;
               const isCenter = index === 2; // Home is now at index 2
@@ -41,7 +41,7 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onChangeView, children }) 
                 <button
                   key={item.id}
                   onClick={() => onChangeView(item.id)}
-                  className={`flex flex-col items-center justify-center gap-1 transition-all duration-300 flex-1 ${
+                  className={`flex flex-col items-center justify-end py-2 transition-all duration-300 flex-1 h-[60px] ${
                     isActive ? '' : 'opacity-60 hover:opacity-100 text-slate-500 dark:text-slate-400'
                   }`}
                   style={isActive && !isCenter ? { color: 'rgb(var(--theme-rgb))' } : {}}
@@ -49,20 +49,20 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onChangeView, children }) 
                   <div 
                     className={`transition-all duration-300 flex items-center justify-center ${
                        isCenter 
-                        ? `w-12 h-12 rounded-full shadow-lg ${isActive ? 'scale-105 shadow-theme-500/40' : ''}` 
+                        ? `w-10 h-10 rounded-full mb-1 shadow-md ${isActive ? 'scale-110 shadow-theme-500/50' : ''}` 
                         : ''
                     }`}
                     style={isCenter ? { backgroundColor: 'rgb(var(--theme-rgb))', color: 'white' } : {}}
                   >
                     <item.icon 
-                        size={24} 
+                        size={isCenter ? 20 : 22} 
                         fill={isActive && item.id === AppView.HOME ? "currentColor" : "none"} 
-                        strokeWidth={2.5} 
+                        strokeWidth={isCenter ? 2 : 2.5} 
                     />
                   </div>
                   
                   {!isCenter && (
-                      <span className="text-[10px] font-bold leading-none">
+                      <span className={`text-[10px] font-bold leading-none mt-1 ${isActive ? 'scale-105' : ''}`}>
                         {item.label}
                       </span>
                   )}
