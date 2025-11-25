@@ -272,10 +272,10 @@ const HomeView: React.FC<{ data: CoupleData, plans: PlanItem[], memories: Memory
   };
 
   return (
-    <div className={`flex flex-col items-center px-4 animate-fade-in-up mt-4 ${FONTS[data.fontStyle] || FONTS.sans}`}>
+    <div className={`flex flex-col items-center px-4 animate-fade-in-up ${FONTS[data.fontStyle] || FONTS.sans}`}>
       {showIOSPrompt && (
           <div className="fixed top-20 left-4 right-4 z-50 animate-fade-in-up">
-              <div className="glass-card bg-white/95 dark:bg-slate-800/95 p-4 rounded-2xl shadow-2xl border border-theme-200 flex items-start gap-4 relative">
+              <div className="glass-card p-4 rounded-2xl shadow-2xl border border-theme-200 flex items-start gap-4 relative">
                    <button onClick={() => setShowIOSPrompt(false)} className="absolute top-2 right-2 text-slate-400"><X size={16}/></button>
                    <div className="p-3 bg-theme-100 rounded-xl">
                        <Share size={24} className="text-theme-500"/>
@@ -354,7 +354,7 @@ const HomeView: React.FC<{ data: CoupleData, plans: PlanItem[], memories: Memory
             </div>
             
             {data.showTimeDetails && (
-                <div className="flex gap-4 mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 w-full justify-center bg-theme-50/50 dark:bg-slate-800/50 rounded-xl py-2">
+                <div className="flex gap-4 mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 w-full justify-center rounded-xl py-2">
                     <div className="text-center w-12"><span className="block font-bold text-lg">{isNaN(time.hours) ? 0 : time.hours}</span><span className="text-[8px] uppercase">Giờ</span></div>
                     <span className="text-xl font-bold">:</span>
                     <div className="text-center w-12"><span className="block font-bold text-lg">{isNaN(time.minutes) ? 0 : time.minutes}</span><span className="text-[8px] uppercase">Phút</span></div>
@@ -405,6 +405,9 @@ const HomeView: React.FC<{ data: CoupleData, plans: PlanItem[], memories: Memory
           </div>
         </div>
       </div>
+      
+      {/* Spacer for dock */}
+      <div className="h-32 md:h-40 w-full shrink-0"></div>
     </div>
   );
 };
@@ -561,7 +564,7 @@ const MemoriesView: React.FC<{
 
   return (
     <div className={`flex flex-col px-4 ${FONTS[fontStyle] || FONTS.sans}`}>
-      <div className="flex justify-between items-center mb-6 pt-6">
+      <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Kỷ Niệm</h2>
         <button onClick={openNew} className="bg-theme-500 text-white p-2 rounded-full shadow-lg shadow-theme-500/30"><Plus size={24} /></button>
       </div>
@@ -711,6 +714,9 @@ const MemoriesView: React.FC<{
           </div>
         )}
       </div>
+      
+      {/* Spacer for dock */}
+      <div className="h-32 md:h-40 w-full shrink-0"></div>
     </div>
   );
 };
@@ -839,7 +845,7 @@ const PlansView: React.FC<PlansViewProps> = ({ fontStyle, plans, onSavePlan, onD
 
     return (
         <div className={`flex flex-col px-6 ${FONTS[fontStyle] || FONTS.sans}`}>
-            <div className="text-center mb-6 pt-6">
+            <div className="text-center mb-6">
                 <span className="text-theme-500 font-bold uppercase tracking-wider text-xs">Tương Lai</span>
                 <h2 className="text-3xl font-bold text-slate-800 dark:text-white mt-1">Dự Định Của Chúng Ta</h2>
             </div>
@@ -959,6 +965,9 @@ const PlansView: React.FC<PlansViewProps> = ({ fontStyle, plans, onSavePlan, onD
                     )
                 })}
             </div>
+            
+            {/* Spacer for dock */}
+            <div className="h-32 md:h-40 w-full shrink-0"></div>
         </div>
     );
 };
@@ -991,7 +1000,7 @@ const PlacesView: React.FC<{ fontStyle: string }> = ({ fontStyle }) => {
 
   return (
     <div className={`flex flex-col px-6 ${FONTS[fontStyle] || FONTS.sans}`}>
-       <div className="text-center mb-6 pt-6">
+       <div className="text-center mb-6">
           <span className="text-theme-500 font-bold uppercase tracking-wider text-xs">Google Maps</span>
           <h2 className="text-3xl font-bold text-slate-800 dark:text-white mt-1">Hẹn Hò Ở Đâu?</h2>
           <p className="text-xs text-slate-500 mt-2">Chọn hoặc tìm kiếm địa điểm gần bạn</p>
@@ -1047,6 +1056,9 @@ const PlacesView: React.FC<{ fontStyle: string }> = ({ fontStyle }) => {
                </div>
            </Portal>
        )}
+       
+       {/* Spacer for dock */}
+       <div className="h-32 md:h-40 w-full shrink-0"></div>
     </div>
   );
 };
@@ -1265,7 +1277,7 @@ const SettingsView: React.FC<{
   };
 
   return (
-    <div className={`p-6 pt-10 max-w-md mx-auto space-y-8 ${FONTS[data.fontStyle] || FONTS.sans}`}>
+    <div className={`p-6 max-w-md mx-auto space-y-8 ${FONTS[data.fontStyle] || FONTS.sans}`}>
       <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Cài Đặt</h2>
 
       {/* Theme & Display */}
@@ -1572,7 +1584,8 @@ const SettingsView: React.FC<{
         <LogOut size={16} className="inline mr-2"/> Xóa dữ liệu & Reset
       </button>
       
-      <div className="h-20"></div>
+      {/* Spacer for dock */}
+      <div className="h-32 md:h-40 w-full shrink-0"></div>
     </div>
   );
 };
