@@ -40,7 +40,7 @@ const DEFAULT_DATA: CoupleData = {
   startDate: new Date().toISOString(),
   bgImage: null,
   bgOpacity: 0.6,
-  cardOpacity: 0.6, // Default opacity for cards
+  cardOpacity: 0.65, // Default opacity for cards
   partner1Name: "Anh",
   partner2Name: "Em",
   partner1Dob: "",
@@ -272,19 +272,7 @@ const HomeView: React.FC<{ data: CoupleData, plans: PlanItem[], memories: Memory
   };
 
   return (
-    <div className={`flex flex-col items-center min-h-full pb-20 relative ${FONTS[data.fontStyle] || FONTS.sans}`}>
-      {!data.globalBackground && (
-          <div 
-            className="fixed inset-0 -z-10 bg-cover bg-center transition-all duration-700"
-            style={{ 
-              backgroundImage: `url(${data.bgImage || "https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=2070&auto=format&fit=crop"})`,
-              opacity: data.bgOpacity
-            }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-b from-theme-50/20 via-white/10 to-theme-50/50 dark:from-slate-900/40 dark:via-slate-900/20 dark:to-slate-950/60"></div>
-          </div>
-      )}
-
+    <div className={`flex flex-col items-center px-4 animate-fade-in-up mt-4 ${FONTS[data.fontStyle] || FONTS.sans}`}>
       {showIOSPrompt && (
           <div className="fixed top-20 left-4 right-4 z-50 animate-fade-in-up">
               <div className="glass-card bg-white/95 dark:bg-slate-800/95 p-4 rounded-2xl shadow-2xl border border-theme-200 flex items-start gap-4 relative">
@@ -303,120 +291,117 @@ const HomeView: React.FC<{ data: CoupleData, plans: PlanItem[], memories: Memory
           </div>
       )}
 
-      <div className="relative z-10 w-full flex flex-col items-center px-4 animate-fade-in-up mt-4">
-        
-        {/* Avatars */}
-        <div className="flex items-center justify-between w-full max-w-xs mb-8">
-            <div className="flex flex-col items-center gap-2">
-                <div className="w-24 h-24 rounded-full border-[5px] border-white dark:border-slate-800 shadow-xl overflow-hidden relative bg-slate-200 transition-transform hover:scale-105">
-                    {data.partner1Avatar ? <img src={data.partner1Avatar} className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">Ảnh</div>}
-                </div>
-                <div className="flex flex-col items-center">
-                    <span className="font-bold text-lg text-slate-800 dark:text-white drop-shadow-md shadow-white">{data.partner1Name}</span>
-                    <span className="text-[10px] uppercase text-theme-600 font-bold tracking-wider">{getZodiacSign(data.partner1Dob)}</span>
-                </div>
-            </div>
-
-            <Heart className="text-theme-500 fill-theme-500 animate-pulse mt-[-30px] drop-shadow-lg" size={48} strokeWidth={1.5} />
-
-            <div className="flex flex-col items-center gap-2">
-                <div className="w-24 h-24 rounded-full border-[5px] border-white dark:border-slate-800 shadow-xl overflow-hidden relative bg-slate-200 transition-transform hover:scale-105">
-                     {data.partner2Avatar ? <img src={data.partner2Avatar} className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">Ảnh</div>}
-                </div>
-                <div className="flex flex-col items-center">
-                    <span className="font-bold text-lg text-slate-800 dark:text-white drop-shadow-md shadow-white">{data.partner2Name}</span>
-                    <span className="text-[10px] uppercase text-theme-600 font-bold tracking-wider">{getZodiacSign(data.partner2Dob)}</span>
-                </div>
-            </div>
-        </div>
-
-        {activeReminders.length > 0 && (
-            <div className="w-full max-w-sm mb-6 space-y-2">
-                {activeReminders.map((r, i) => (
-                     <div key={i} className={`backdrop-blur-md border p-3 rounded-2xl flex items-start gap-3 animate-pulse-slow ${
-                         r.type === 'memory' ? 'bg-purple-500/10 border-purple-500/30' : 'bg-red-500/10 border-red-500/30'
-                     }`}>
-                        <div className={`p-2 rounded-full text-white shadow-lg ${r.type === 'memory' ? 'bg-purple-500 shadow-purple-500/40' : 'bg-red-500 shadow-red-500/40'}`}>
-                            {r.type === 'memory' ? <History size={20} /> : <BellRing size={20} />}
-                        </div>
-                        <div className="flex-1">
-                            <h4 className={`font-bold text-sm ${r.type === 'memory' ? 'text-purple-600 dark:text-purple-400' : 'text-red-600 dark:text-red-400'}`}>
-                                {r.type === 'memory' ? 'Kỷ Niệm Năm Xưa' : 'Nhắc Nhở Hôm Nay'}
-                            </h4>
-                            <span className="text-xs text-slate-700 dark:text-slate-200 font-medium">{r.title}</span>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        )}
-
-        {/* Main Counter */}
-        <div className="mb-6 relative group cursor-pointer w-full max-w-sm">
-          <div className="glass rounded-3xl p-6 border-2 border-white/60 flex flex-col items-center justify-center shadow-2xl relative overflow-hidden">
-             <div className="text-theme-500 font-bold uppercase tracking-widest text-xs mb-2">Bên Nhau</div>
-             
-             <h1 className="text-6xl md:text-7xl font-bold text-theme-600 dark:text-theme-400 drop-shadow-sm leading-none pb-2 font-cursive">
-               {isNaN(time.totalDays) ? 0 : time.totalDays}
-             </h1>
-             <span className="text-lg font-medium text-slate-600 dark:text-slate-300 mb-4">Ngày</span>
-
-             <div className="grid grid-cols-4 gap-4 w-full pt-4 border-t border-slate-200 dark:border-slate-700">
-                 <SafeDisplay value={time.years} label="Năm" />
-                 <SafeDisplay value={time.months} label="Tháng" />
-                 <SafeDisplay value={time.weeks} label="Tuần" />
-                 <SafeDisplay value={time.days} label="Ngày" />
-             </div>
-             
-             {data.showTimeDetails && (
-                 <div className="flex gap-4 mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 w-full justify-center bg-theme-50/50 dark:bg-slate-800/50 rounded-xl py-2">
-                     <div className="text-center w-12"><span className="block font-bold text-lg">{isNaN(time.hours) ? 0 : time.hours}</span><span className="text-[8px] uppercase">Giờ</span></div>
-                     <span className="text-xl font-bold">:</span>
-                     <div className="text-center w-12"><span className="block font-bold text-lg">{isNaN(time.minutes) ? 0 : time.minutes}</span><span className="text-[8px] uppercase">Phút</span></div>
-                     <span className="text-xl font-bold">:</span>
-                     <div className="text-center w-12"><span className="block font-bold text-lg">{isNaN(time.seconds) ? 0 : time.seconds}</span><span className="text-[8px] uppercase">Giây</span></div>
-                 </div>
-             )}
+      {/* Avatars */}
+      <div className="flex items-center justify-between w-full max-w-xs mb-8">
+          <div className="flex flex-col items-center gap-2">
+              <div className="w-24 h-24 rounded-full border-[5px] border-white dark:border-slate-800 shadow-xl overflow-hidden relative bg-slate-200 transition-transform hover:scale-105">
+                  {data.partner1Avatar ? <img src={data.partner1Avatar} className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">Ảnh</div>}
+              </div>
+              <div className="flex flex-col items-center">
+                  <span className="font-bold text-lg text-slate-800 dark:text-white drop-shadow-md shadow-white">{data.partner1Name}</span>
+                  <span className="text-[10px] uppercase text-theme-600 font-bold tracking-wider">{getZodiacSign(data.partner1Dob)}</span>
+              </div>
           </div>
-        </div>
 
-        {/* Pinned Plans */}
-        {pinnedPlans.length > 0 && (
-          <div className="w-full max-w-sm mb-4 space-y-2">
-             <div className="flex items-center gap-2 mb-1 pl-1">
-                 <Pin size={12} className="text-theme-500"/>
-                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Đã ghim</span>
-             </div>
-             {pinnedPlans.map(plan => {
-                 const daysLeft = getDaysUntilPlan(plan.targetDate);
-                 return (
-                    <div key={plan.id} className="glass-card p-3 rounded-2xl flex items-center justify-between transition-transform active:scale-[0.98]">
-                        <div className="flex-1 pr-2">
-                            <h4 className="font-bold text-slate-800 dark:text-white text-sm line-clamp-1">{plan.title}</h4>
-                            <p className="text-[10px] text-slate-500 mt-0.5">{new Date(plan.targetDate).toLocaleDateString('vi-VN')}</p>
-                        </div>
-                        <div className={`text-center px-3 py-1 rounded-xl min-w-[60px] ${daysLeft < 0 ? 'bg-red-100 text-red-600' : 'bg-theme-100 text-theme-600'}`}>
-                            <span className="block text-lg font-bold leading-none">
-                                {isNaN(daysLeft) ? '-' : (daysLeft < 0 ? 'Xong' : daysLeft)}
-                            </span>
-                            <span className="text-[8px] font-bold opacity-80">Ngày</span>
-                        </div>
-                    </div>
-                 )
-             })}
+          <Heart className="text-theme-500 fill-theme-500 animate-pulse mt-[-30px] drop-shadow-lg" size={48} strokeWidth={1.5} />
+
+          <div className="flex flex-col items-center gap-2">
+              <div className="w-24 h-24 rounded-full border-[5px] border-white dark:border-slate-800 shadow-xl overflow-hidden relative bg-slate-200 transition-transform hover:scale-105">
+                    {data.partner2Avatar ? <img src={data.partner2Avatar} className="w-full h-full object-cover"/> : <div className="w-full h-full flex items-center justify-center text-slate-400 text-xs">Ảnh</div>}
+              </div>
+              <div className="flex flex-col items-center">
+                  <span className="font-bold text-lg text-slate-800 dark:text-white drop-shadow-md shadow-white">{data.partner2Name}</span>
+                  <span className="text-[10px] uppercase text-theme-600 font-bold tracking-wider">{getZodiacSign(data.partner2Dob)}</span>
+              </div>
           </div>
-        )}
+      </div>
 
-        <div className="w-full max-w-sm space-y-3">
-          <div className="glass-card p-4 rounded-2xl flex items-center justify-between">
-            <div>
-              <p className="text-xs font-bold text-slate-500 uppercase mb-1">Cột mốc tiếp theo</p>
-              <h3 className="text-lg font-bold text-theme-600 dark:text-theme-400">{milestone.label}</h3>
-              <p className="text-xs text-slate-500 mt-1">{milestone.targetDate}</p>
+      {activeReminders.length > 0 && (
+          <div className="w-full max-w-sm mb-6 space-y-2">
+              {activeReminders.map((r, i) => (
+                    <div key={i} className={`backdrop-blur-md border p-3 rounded-2xl flex items-start gap-3 animate-pulse-slow ${
+                        r.type === 'memory' ? 'bg-purple-500/10 border-purple-500/30' : 'bg-red-500/10 border-red-500/30'
+                    }`}>
+                      <div className={`p-2 rounded-full text-white shadow-lg ${r.type === 'memory' ? 'bg-purple-500 shadow-purple-500/40' : 'bg-red-500 shadow-red-500/40'}`}>
+                          {r.type === 'memory' ? <History size={20} /> : <BellRing size={20} />}
+                      </div>
+                      <div className="flex-1">
+                          <h4 className={`font-bold text-sm ${r.type === 'memory' ? 'text-purple-600 dark:text-purple-400' : 'text-red-600 dark:text-red-400'}`}>
+                              {r.type === 'memory' ? 'Kỷ Niệm Năm Xưa' : 'Nhắc Nhở Hôm Nay'}
+                          </h4>
+                          <span className="text-xs text-slate-700 dark:text-slate-200 font-medium">{r.title}</span>
+                      </div>
+                  </div>
+              ))}
+          </div>
+      )}
+
+      {/* Main Counter */}
+      <div className="mb-6 relative group cursor-pointer w-full max-w-sm">
+        <div className="glass rounded-3xl p-6 border-2 border-white/60 flex flex-col items-center justify-center shadow-2xl relative overflow-hidden">
+            <div className="text-theme-500 font-bold uppercase tracking-widest text-xs mb-2">Bên Nhau</div>
+            
+            <h1 className="text-6xl md:text-7xl font-bold text-theme-600 dark:text-theme-400 drop-shadow-sm leading-none pb-2 font-cursive">
+              {isNaN(time.totalDays) ? 0 : time.totalDays}
+            </h1>
+            <span className="text-lg font-medium text-slate-600 dark:text-slate-300 mb-4">Ngày</span>
+
+            <div className="grid grid-cols-4 gap-4 w-full pt-4 border-t border-slate-200 dark:border-slate-700">
+                <SafeDisplay value={time.years} label="Năm" />
+                <SafeDisplay value={time.months} label="Tháng" />
+                <SafeDisplay value={time.weeks} label="Tuần" />
+                <SafeDisplay value={time.days} label="Ngày" />
             </div>
-            <div className="text-center bg-theme-100 dark:bg-theme-900/30 p-2 rounded-xl min-w-[70px]">
-              <span className="block text-xl font-bold text-theme-600 dark:text-theme-400">{isNaN(milestone.daysLeft) ? 0 : milestone.daysLeft}</span>
-              <span className="text-[9px] text-theme-600/70">Ngày nữa</span>
+            
+            {data.showTimeDetails && (
+                <div className="flex gap-4 mt-4 pt-4 border-t border-slate-200 dark:border-slate-700 w-full justify-center bg-theme-50/50 dark:bg-slate-800/50 rounded-xl py-2">
+                    <div className="text-center w-12"><span className="block font-bold text-lg">{isNaN(time.hours) ? 0 : time.hours}</span><span className="text-[8px] uppercase">Giờ</span></div>
+                    <span className="text-xl font-bold">:</span>
+                    <div className="text-center w-12"><span className="block font-bold text-lg">{isNaN(time.minutes) ? 0 : time.minutes}</span><span className="text-[8px] uppercase">Phút</span></div>
+                    <span className="text-xl font-bold">:</span>
+                    <div className="text-center w-12"><span className="block font-bold text-lg">{isNaN(time.seconds) ? 0 : time.seconds}</span><span className="text-[8px] uppercase">Giây</span></div>
+                </div>
+            )}
+        </div>
+      </div>
+
+      {/* Pinned Plans */}
+      {pinnedPlans.length > 0 && (
+        <div className="w-full max-w-sm mb-4 space-y-2">
+            <div className="flex items-center gap-2 mb-1 pl-1">
+                <Pin size={12} className="text-theme-500"/>
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Đã ghim</span>
             </div>
+            {pinnedPlans.map(plan => {
+                const daysLeft = getDaysUntilPlan(plan.targetDate);
+                return (
+                  <div key={plan.id} className="glass-card p-3 rounded-2xl flex items-center justify-between transition-transform active:scale-[0.98]">
+                      <div className="flex-1 pr-2">
+                          <h4 className="font-bold text-slate-800 dark:text-white text-sm line-clamp-1">{plan.title}</h4>
+                          <p className="text-[10px] text-slate-500 mt-0.5">{new Date(plan.targetDate).toLocaleDateString('vi-VN')}</p>
+                      </div>
+                      <div className={`text-center px-3 py-1 rounded-xl min-w-[60px] ${daysLeft < 0 ? 'bg-red-100 text-red-600' : 'bg-theme-100 text-theme-600'}`}>
+                          <span className="block text-lg font-bold leading-none">
+                              {isNaN(daysLeft) ? '-' : (daysLeft < 0 ? 'Xong' : daysLeft)}
+                          </span>
+                          <span className="text-[8px] font-bold opacity-80">Ngày</span>
+                      </div>
+                  </div>
+                )
+            })}
+        </div>
+      )}
+
+      <div className="w-full max-w-sm space-y-3">
+        <div className="glass-card p-4 rounded-2xl flex items-center justify-between">
+          <div>
+            <p className="text-xs font-bold text-slate-500 uppercase mb-1">Cột mốc tiếp theo</p>
+            <h3 className="text-lg font-bold text-theme-600 dark:text-theme-400">{milestone.label}</h3>
+            <p className="text-xs text-slate-500 mt-1">{milestone.targetDate}</p>
+          </div>
+          <div className="text-center bg-theme-100 dark:bg-theme-900/30 p-2 rounded-xl min-w-[70px]">
+            <span className="block text-xl font-bold text-theme-600 dark:text-theme-400">{isNaN(milestone.daysLeft) ? 0 : milestone.daysLeft}</span>
+            <span className="text-[9px] text-theme-600/70">Ngày nữa</span>
           </div>
         </div>
       </div>
@@ -575,8 +560,8 @@ const MemoriesView: React.FC<{
   }, [memories]);
 
   return (
-    <div className={`flex flex-col h-full pt-10 px-4 ${FONTS[fontStyle] || FONTS.sans}`}>
-      <div className="flex justify-between items-center mb-6">
+    <div className={`flex flex-col px-4 ${FONTS[fontStyle] || FONTS.sans}`}>
+      <div className="flex justify-between items-center mb-6 pt-6">
         <h2 className="text-2xl font-bold text-slate-800 dark:text-white">Kỷ Niệm</h2>
         <button onClick={openNew} className="bg-theme-500 text-white p-2 rounded-full shadow-lg shadow-theme-500/30"><Plus size={24} /></button>
       </div>
@@ -640,7 +625,7 @@ const MemoriesView: React.FC<{
         </Portal>
       )}
 
-      <div className="flex-1 overflow-y-auto pb-24 pr-1 relative">
+      <div className="relative">
         {activeTab === 'timeline' && (
             <div className="flex flex-col space-y-6">
                 {memories.length === 0 && <div className="text-center text-slate-400 mt-10">Chưa có kỷ niệm nào. <br/>Hãy bấm nút + để thêm nhé!</div>}
@@ -658,7 +643,7 @@ const MemoriesView: React.FC<{
                      return (
                         <div key={mem.id} className="relative px-2">
                              {showHeader && (
-                                <div className="sticky top-0 z-20 bg-white/90 dark:bg-slate-950/90 backdrop-blur py-2 mb-4 border-b border-theme-100 dark:border-slate-800">
+                                <div className="sticky top-0 z-20 bg-white/90 dark:bg-slate-950/90 backdrop-blur py-2 mb-4 border-b border-theme-100 dark:border-slate-800 -mx-6 px-6">
                                     <h3 className="text-xl font-bold text-theme-500 pl-4">{`Tháng ${d.getMonth() + 1}, ${d.getFullYear()}`}</h3>
                                 </div>
                              )}
@@ -853,8 +838,8 @@ const PlansView: React.FC<PlansViewProps> = ({ fontStyle, plans, onSavePlan, onD
         });
 
     return (
-        <div className={`flex flex-col h-full pt-10 px-6 ${FONTS[fontStyle] || FONTS.sans}`}>
-            <div className="text-center mb-6">
+        <div className={`flex flex-col px-6 ${FONTS[fontStyle] || FONTS.sans}`}>
+            <div className="text-center mb-6 pt-6">
                 <span className="text-theme-500 font-bold uppercase tracking-wider text-xs">Tương Lai</span>
                 <h2 className="text-3xl font-bold text-slate-800 dark:text-white mt-1">Dự Định Của Chúng Ta</h2>
             </div>
@@ -928,7 +913,7 @@ const PlansView: React.FC<PlansViewProps> = ({ fontStyle, plans, onSavePlan, onD
                 </Portal>
             )}
 
-            <div className="flex-1 overflow-y-auto pb-24 space-y-4">
+            <div className="space-y-4">
                 {filteredPlans.map(plan => {
                     const days = getDaysLeft(plan.targetDate);
                     return (
@@ -1005,8 +990,8 @@ const PlacesView: React.FC<{ fontStyle: string }> = ({ fontStyle }) => {
   }
 
   return (
-    <div className={`flex flex-col h-full pt-10 px-6 ${FONTS[fontStyle] || FONTS.sans}`}>
-       <div className="text-center mb-6">
+    <div className={`flex flex-col px-6 ${FONTS[fontStyle] || FONTS.sans}`}>
+       <div className="text-center mb-6 pt-6">
           <span className="text-theme-500 font-bold uppercase tracking-wider text-xs">Google Maps</span>
           <h2 className="text-3xl font-bold text-slate-800 dark:text-white mt-1">Hẹn Hò Ở Đâu?</h2>
           <p className="text-xs text-slate-500 mt-2">Chọn hoặc tìm kiếm địa điểm gần bạn</p>
@@ -1025,7 +1010,7 @@ const PlacesView: React.FC<{ fontStyle: string }> = ({ fontStyle }) => {
            </button>
        </div>
 
-       <div className="grid grid-cols-3 gap-3 pb-24">
+       <div className="grid grid-cols-3 gap-3">
            {PLACE_CATEGORIES.map(c => (
                <button 
                 key={c.id} 
@@ -1380,11 +1365,11 @@ const SettingsView: React.FC<{
              <div className="pt-2 border-t border-slate-100 dark:border-slate-700">
                  <div className="flex justify-between items-center mb-1">
                     <span className="text-sm font-medium dark:text-white">Độ mờ thẻ</span>
-                    <span className="text-xs text-slate-500">{Math.round((data.cardOpacity ?? 0.6) * 100)}%</span>
+                    <span className="text-xs text-slate-500">{Math.round((data.cardOpacity ?? 0.65) * 100)}%</span>
                  </div>
                  <input 
                     type="range" min="0.1" max="1" step="0.05"
-                    value={data.cardOpacity ?? 0.6}
+                    value={data.cardOpacity ?? 0.65}
                     onChange={(e) => handleUpdate('cardOpacity', parseFloat(e.target.value))}
                     className="w-full h-1 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-theme-500"
                  />
@@ -1616,9 +1601,15 @@ const App: React.FC = () => {
             if (dbSettings) {
                 setData(dbSettings);
                 const dbPlans = await dbService.getAll<PlanItem>('plans');
-                const dbMemories = await dbService.getAll<Memory>('memories');
+                // SORT PLANS: Closest date first
+                dbPlans.sort((a, b) => new Date(a.targetDate).getTime() - new Date(b.targetDate).getTime());
                 setPlans(dbPlans);
+
+                const dbMemories = await dbService.getAll<Memory>('memories');
+                // SORT MEMORIES: Newest date first
+                dbMemories.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
                 setMemories(dbMemories);
+
                 if (dbSettings.securityPin) setIsLocked(true);
             } else {
                 const lsData = localStorage.getItem('lovesync_data');
@@ -1655,7 +1646,7 @@ const App: React.FC = () => {
              const rgb = hexToRgb(data.themeColor || '#fa3452');
              document.documentElement.style.setProperty('--theme-rgb', rgb);
              // Sync Card Opacity to CSS Variable
-             document.documentElement.style.setProperty('--card-opacity', String(data.cardOpacity || 0.6));
+             document.documentElement.style.setProperty('--card-opacity', String(data.cardOpacity || 0.65));
         });
     }
   }, [data, loading]);
@@ -1669,6 +1660,7 @@ const App: React.FC = () => {
       setMemories(prev => {
           const exists = prev.find(m => m.id === mem.id);
           const newList = exists ? prev.map(m => m.id === mem.id ? mem : m) : [mem, ...prev];
+          // SORT: Newest date first
           return newList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
       });
       await dbService.saveMemory(mem);
@@ -1680,14 +1672,20 @@ const App: React.FC = () => {
   }
 
   const handleUpdateMemory = async (mem: Memory) => {
-       setMemories(prev => prev.map(m => m.id === mem.id ? mem : m));
+       setMemories(prev => {
+           const newList = prev.map(m => m.id === mem.id ? mem : m);
+           // Re-sort just in case date changed, though unlikely for media deletion
+           return newList.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+       });
        await dbService.saveMemory(mem);
   }
 
   const handleSavePlan = async (p: PlanItem) => {
        setPlans(prev => {
            const exists = prev.find(item => item.id === p.id);
-           return exists ? prev.map(item => item.id === p.id ? p : item) : [...prev, p];
+           const newList = exists ? prev.map(item => item.id === p.id ? p : item) : [...prev, p];
+           // SORT: Closest date first
+           return newList.sort((a, b) => new Date(a.targetDate).getTime() - new Date(b.targetDate).getTime());
        });
        await dbService.savePlan(p);
   }
@@ -1811,14 +1809,18 @@ const App: React.FC = () => {
     <Layout currentView={currentView} onChangeView={setCurrentView}>
       <HeartCanvas active={true} type={data.themeEffect} />
       
-      {data.globalBackground && data.bgImage && (
+      {/* GLOBAL BACKGROUND - RENDERED AT ROOT LEVEL FOR FULL SCREEN COVERAGE */}
+      {(currentView === AppView.HOME || data.globalBackground) && (
           <div 
             className="fixed inset-0 z-0 bg-cover bg-center pointer-events-none transition-all duration-700"
             style={{ 
-                backgroundImage: `url(${data.bgImage})`,
+                backgroundImage: `url(${data.bgImage || "https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=2070&auto=format&fit=crop"})`,
                 opacity: data.bgOpacity
             }}
-          />
+          >
+             {/* Gradient Overlay for readability */}
+             <div className="absolute inset-0 bg-gradient-to-b from-theme-50/20 via-white/10 to-theme-50/50 dark:from-slate-900/40 dark:via-slate-900/20 dark:to-slate-950/60"></div>
+          </div>
       )}
 
       <div className="relative z-10 h-full">
