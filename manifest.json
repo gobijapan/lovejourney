@@ -3,12 +3,12 @@
   "name": "LoveJourney - Hành Trình Yêu",
   "icons": [
     {
-      "src": "/public/lovejourney-icon-512.png",
+      "src": "/lovejourney-icon-512.png",
       "type": "image/png",
       "sizes": "192x192"
     },
     {
-      "src": "/public/lovejourney-icon-512.png",
+      "src": "/lovejourney-icon-512.png",
       "type": "image/png",
       "sizes": "512x512"
     }
